@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 
 int booth(int a, int b)
 {   
@@ -14,7 +15,7 @@ int booth(int a, int b)
     int num_size = 16; // Size of the registers
     if (b < 0) b += 1 << num_size;
 
-    for (int i = sizeof(int) * 8 / 2; i > 0; i--)
+    for (int i = num_size; i > 0; i--)
     {   
         // Check if the last two bits are 01 or 10
         if ((b & 1) && !rem) {
@@ -44,20 +45,20 @@ int rec_div(int q, int m)
     int num_size = 16; // Size of the registers
     int temp = 0;
 
-    for (int i = sizeof(int) * 8 / 2; i > 0; i--)
+    for (int i = num_size; i > 0; i--)
     {   
-        temp = 0;  // Temperary variable for storage of 
-
+        temp = 0;  // Temperary variable for storage
         q = q << 1;
         
-        if ((m >> 31) ^ (q >> 31)) {
+        if (((m >> 31) & 1) ^ ((q >> 31) & 1)) {
             // If MSB of m and q are different
             temp = q + (m << num_size);
         } else {
             // If MSB of m and q are same
             temp = q + (-m << num_size);
         }
-        if ((temp >> 31) == (q >> 31)) {
+        
+        if (((temp >> 31) & 1) == ((q >> 31) & 1)) {
             q = temp | 1;
             // If the sign of the result is same as the sign of q
             // Set the LSB of q to 1
@@ -105,7 +106,7 @@ int main()
     {
         int expected_qut = a / b;
         int expected_rem = a % b;
-        int div_val = rec_div(a, b);
+        int div_val = rec_div(abs(a), abs(b));
         // Get the quotient and remainder
 
         // Truncating top 16 bits to retrieve the quotient
